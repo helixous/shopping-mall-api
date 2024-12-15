@@ -62,5 +62,14 @@ class Product(models.Model):
         default=False
     )
 
+    def calc_discounted_price(self) -> int:
+        """
+        할인율이 적용된 상품가격 반환기
+        :return:
+        """
+        from decimal import Decimal
+        result: Decimal = self.price * Decimal(1 - self.discount_rate)
+        return int(result)
+
     def __str__(self):
         return self.name
