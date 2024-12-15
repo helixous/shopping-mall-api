@@ -1,3 +1,5 @@
+from decimal import Decimal
+
 from django.db import models
 
 
@@ -67,9 +69,22 @@ class Product(models.Model):
         할인율이 적용된 상품가격 반환기
         :return:
         """
-        from decimal import Decimal
         result: Decimal = self.price * Decimal(1 - self.discount_rate)
         return int(result)
+
+    def calc_coupon_applied_price(self, coupon: 'Coupon') -> int:
+        """
+        쿠폰 할인율이 적용된 최종 가격 반환
+        :param coupon: 적용할 쿠폰 객체
+        :return: 쿠폰 할인율이 적용된 가격 (int)
+        """
+        discounted_price: int = self.calc_discounted_price()
+        # 상품에 쿠폰이 적용 가능할 경우에 쿠폰 할인율을 적용한다.
+        if self.coupon_applicable:
+            result: Decimal = discounted_price * Decimal(1 - coupon.discount_rate)
+            return int(result)
+        # 쿠폰 적용 불가능할 경우 상품 자체 할인율만 적용된 금액 리턴
+        return discounted_price
 
     def __str__(self):
         return self.name
